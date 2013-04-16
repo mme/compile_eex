@@ -1,3 +1,5 @@
 /ebin
 /deps
 erl_crash.dump
+/test_project/ebin
+/test_project/deps
