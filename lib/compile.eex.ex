@@ -68,6 +68,8 @@ defmodule Mix.Tasks.Compile.Eex do
     to_watch   = Mix.Project.config_files ++ Mix.Utils.extract_files(eexc_paths, watch_exts)
     stale      = Mix.Utils.extract_stale(to_watch, [compile_path])
     
+    IO.inspect to_watch
+    
     if opts[:force] or stale != [] do
       Mix.Utils.preserving_mtime(compile_path, fn ->
         File.mkdir_p! compile_path
@@ -99,8 +101,7 @@ defmodule Mix.Tasks.Compile.Eex do
   
   defp compile_files(files, to) do
     Enum.each files, fn(file) ->
-      
-      module = Macro.to_binary(make_module(make_module_name(file), file))
+      module = make_module(make_module_name(file), file)
       [{module_name, code}] = Code.compile_string(module, file)
       path = Path.join(to, module_name ) <> ".beam"
       File.write! path, code
@@ -109,16 +110,16 @@ defmodule Mix.Tasks.Compile.Eex do
   end
   
   defp make_module_name(file), do: 
-    binary_to_atom(Enum.map_join Path.split(Path.rootname(file)), ".", String.capitalize(&1))
+    Enum.map_join Path.split(Path.rootname(file)), ".", String.capitalize(&1)
   
   defp make_module(module_name, file) do
-    quote do
-      defmodule unquote(module_name) do
-        require EEx
-        require EEx.SmartEngine
-        EEx.function_from_file :def, :render, unquote(file), [:assigns]
-      end
+    """
+    defmodule #{module_name} do
+      require EEx
+      require EEx.SmartEngine
+      EEx.function_from_file :def, :render, "#{file}", [:assigns]
     end
+    """
   end
   
 end
