@@ -25,9 +25,12 @@ e.g. when there is a ``` templates/hello.html ``` file, it will get compiled to 
 
 to render a string, call the render function.
 
+templates/hello.html
 ```erb
 Hello <%= @what %>
 ```
+
+elixir:
 ```elixir 
 Templates.Hello what: "World" 
 ```
