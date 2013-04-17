@@ -37,6 +37,7 @@ Templates.Hello what: "World"
 renders "Hello World"
 
 With ``` @ ```, output will get escaped. To output the raw string, use ``` unsafe! ``` instead, e.g.
+
 templates/layout.html
 ```erb
 <html>
