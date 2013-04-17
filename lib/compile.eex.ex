@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Compile.Eex do
     compile_exts  = project[:eexc_exts] || [:html]
     eexc_paths    = project[:eexc_paths] || ["templates"]
     
-    File.mkdir_p! compile_path
+    
     
     to_compile = Mix.Utils.extract_files(eexc_paths, compile_exts)
     stale = Enum.filter to_compile, fn(file) ->
@@ -40,11 +40,14 @@ defmodule Mix.Tasks.Compile.Eex do
       last_modified(file) > last_modified(module_file) 
     end
     
-    cond do
-      opts[:force] -> compile_files(to_compile, compile_path)
-      stale != []  -> compile_files(stale, compile_path)
-      true         -> :noop
-    end
+    Mix.Utils.preserving_mtime(compile_path, fn ->
+      File.mkdir_p! compile_path
+      cond do
+        opts[:force] -> compile_files(to_compile, compile_path)
+        stale != []  -> compile_files(stale, compile_path)
+        true         -> :noop
+      end
+    end)
     
   end
   
