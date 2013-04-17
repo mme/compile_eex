@@ -21,7 +21,7 @@ end
 
 by default, the html files in the templates directory will get compiled.
 
-e.g. when there is a ``` templates/hello.html ``` file, it will get compiled to Templates.Hello when  ``` mix compile ``` is executed
+e.g. when there is a ``` templates/hello.html ``` file, it will get compiled to ``` Templates.Hello ``` when  ``` mix compile ``` is executed
 
 to render a string, call the render function.
 
