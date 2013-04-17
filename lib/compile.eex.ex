@@ -6,6 +6,10 @@ defmodule Mix.Tasks.Compile.Eex do
 
   @moduledoc """
   A task to compile Eex source files.
+  
+  ## Command line options
+
+   * `--force` - forces compilation regardless of module times;
 
   ## Configuration
 
@@ -19,23 +23,43 @@ defmodule Mix.Tasks.Compile.Eex do
          [eexc_exts: [:html]]
          
   """
-  def run(_args) do
+  def run(args) do
+    
+    { opts, _ } = OptionParser.parse(args, aliases: [], switches: [force: :boolean])
 
     project       = Mix.project
     compile_path  = project[:compile_path]
     compile_exts  = project[:eexc_exts] || [:html]
     eexc_paths    = project[:eexc_paths] || ["templates"]
-
-    to_compile = Mix.Utils.extract_files(eexc_paths, compile_exts)
     
     File.mkdir_p! compile_path
-    compile_files to_compile, compile_path
+    
+    to_compile = Mix.Utils.extract_files(eexc_paths, compile_exts)
+    stale = Enum.filter to_compile, fn(file) ->
+      module_file = Path.join(compile_path, beam_file_name(file))
+      last_modified(file) > last_modified(module_file) 
+    end
+    
+    cond do
+      opts[:force] -> compile_files(to_compile, compile_path)
+      stale != []  -> compile_files(stale, compile_path)
+      true         -> :noop
+    end
+    
+  end
+  
+  # stolen from https://github.com/elixir-lang/elixir/blob/master/lib/mix/lib/mix/utils.ex
+  defp last_modified(path) do
+    case File.stat(path) do
+      { :ok, File.Stat[mtime: mtime] } -> mtime
+      { :error, _ } -> { { 1970, 1, 1 }, { 0, 0, 0 } }
+    end
   end
   
   defp compile_files(files, to) do
     Code.delete_path to
     Enum.each files, fn(file) ->
-      module = make_module(make_module_name(file), file)
+      module = make_module(module_name(file), file)
       [{module_name, code}] = Code.compile_string(module, file)
       path = Path.join(to, module_name ) <> ".beam"
       File.write! path, code
@@ -44,8 +68,11 @@ defmodule Mix.Tasks.Compile.Eex do
     Code.prepend_path to
   end
   
-  defp make_module_name(file), do: 
+  defp module_name(file), do: 
     Enum.map_join Path.split(Path.rootname(file)), ".", String.capitalize(&1)
+    
+  defp beam_file_name(file), do:
+    "Elixir-" <> (Enum.map_join Path.split(Path.rootname(file)), "-", String.capitalize(&1)) <> ".beam"
   
   defp make_module(module_name, file) do
     """
