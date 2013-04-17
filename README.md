@@ -26,12 +26,12 @@ e.g. when there is a ``` templates/hello.html ``` file, it will get compiled to 
 to render a string, call the render function.
 
 ```
-Hello <%= @name =>
+Hello <%= @what =>
 ```
 ```elixir 
-Templates.Hello name: "Markus" 
+Templates.Hello what: "World" 
 ```
-renders "Hello Markus"
+renders "Hello World"
 
 TODO
 -------------------------
