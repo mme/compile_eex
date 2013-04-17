@@ -9,28 +9,28 @@ defmodule EEx.EscapingEngine do
 
   @doc false
 
-      @behavior EEx.Engine
-      
-      def handle_text(buffer, text) do
-        EEx.Engine.handle_text(buffer, text)
-      end
+  @behavior EEx.Engine
+  
+  def handle_text(buffer, text) do
+    EEx.Engine.handle_text(buffer, text)
+  end
 
-      def handle_expr(buffer, mark, expr) do
-        EEx.Engine.handle_expr(buffer, mark, transform(expr))
-      end
-      
-      
-      defp transform({ :@, _line, [{ name, _, atom }] }) when is_atom(name) and is_atom(atom) do
-        quote(do: escape(Keyword.get var!(_assigns), unquote(name)))
-      end
-      
-      defp transform({ :unsafe!, _line, [{ name, _, atom }] }) when is_atom(name) and is_atom(atom) do
-        quote(do: Keyword.get var!(_assigns), unquote(name))
-      end
-      
-      defp transform(other) do
-        other
-      end
+  def handle_expr(buffer, mark, expr) do
+    EEx.Engine.handle_expr(buffer, mark, transform(expr))
+  end
+  
+  
+  defp transform({ :@, _line, [{ name, _, atom }] }) when is_atom(name) and is_atom(atom) do
+    quote(do: escape(Keyword.get var!(_assigns), unquote(name)))
+  end
+  
+  defp transform({ :unsafe!, _line, [{ name, _, atom }] }) when is_atom(name) and is_atom(atom) do
+    quote(do: Keyword.get var!(_assigns), unquote(name))
+  end
+  
+  defp transform(other) do
+    other
+  end
 
 end
 

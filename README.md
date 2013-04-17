@@ -36,10 +36,16 @@ Templates.Hello what: "World"
 ```
 renders "Hello World"
 
-TODO
--------------------------
-- Recompile only when the template has changed
-- Add functions for escaping output
+With ``` @ ```, output will get escaped. To output the raw string, use ``` unsafe! ``` instead, e.g.
+templates/layout.html
+```erb
+<html>
+<body>
+<%= unsafe! content %>
+</body>
+</html>
+```
+
 
 License
 -------------------------
