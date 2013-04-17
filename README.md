@@ -28,7 +28,9 @@ to render a string, call the render function.
 ```
 Hello <%= @name =>
 ```
-```elixir Templates.Hello name: "Markus" ```
+```elixir 
+Templates.Hello name: "Markus" 
+```
 renders "Hello Markus"
 
 TODO
