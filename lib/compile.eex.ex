@@ -40,14 +40,14 @@ defmodule Mix.Tasks.Compile.Eex do
       last_modified(file) > last_modified(module_file) 
     end
     
-    Mix.Utils.preserving_mtime(compile_path, fn ->
+    #Mix.Utils.preserving_mtime(compile_path, fn ->
       File.mkdir_p! compile_path
       cond do
         opts[:force] -> compile_files(to_compile, compile_path)
         stale != []  -> compile_files(stale, compile_path)
         true         -> :noop
       end
-    end)
+      #end)
     
   end
   
@@ -78,11 +78,13 @@ defmodule Mix.Tasks.Compile.Eex do
     "Elixir-" <> (Enum.map_join Path.split(Path.rootname(file)), "-", String.capitalize(&1)) <> ".beam"
   
   defp make_module(module_name, file) do
+    # result = EEx.eval_string(actual, [], file: __FILE__, engine: EEx.Engine)
     """
+    require EEx
     defmodule #{module_name} do
-      require EEx
-      require EEx.SmartEngine
-      EEx.function_from_file :def, :render, "#{file}", [:assigns]
+      use Eex.EscapingEngine.Functions
+      def render(assigns // []), do: _render(assigns)
+      EEx.function_from_file :defp, :_render, "#{file}", [:_assigns], [engine: EEx.EscapingEngine]
     end
     """
   end
