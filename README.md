@@ -1,7 +1,7 @@
 compile_eex
 ================================
 
-*mix task for compiling eex templates*
+*A mix task for compiling eex templates*
 
 
 Quick start
